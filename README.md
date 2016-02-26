@@ -58,6 +58,10 @@ __`query`__
 
 An object of parameters to be appended to the querystring of the specified `url`. This is a good way to append sensitive parameters that are stored as environment variables on the server avoiding the need to expose them to the client. Any parameters specified here will override an identically named parameter in the `url` or on the incoming request to the proxy. Defaults to `{}`.
 
+__`originalQuery`__
+
+Boolean value that, if set to `true`, just uses the original query string (everything after the `?` in the URL).  This is needed if you are using non-standard nested query parameters, such as `?key[foo][]=value`, because core [querystring](https://nodejs.org/api/querystring.html) doesn't understand them.  If this is set to `true`, the `query` parameter above is ignored.  Defaults to `false`.
+
 __`headers`__
 
 An object of HTTP headers to be appended to the request to the remote url. This is also a good way to inject sensitive keys stored in environment variables. See the [http basic auth](#http-basic-auth) section for example usage.
@@ -81,6 +85,10 @@ The user agent string passed as a header in the http call to the remote API. Def
 __`cacheHttpHeader`__
 
 Name of the http header returned in the proxy response with the value `"hit"` or `"miss"`. Defaults to `"Express-Request-Proxy-Cache"`.
+
+__`setCacheControlHeader`__
+
+Set the `Cache-Control` http header in the response, as described below.  Defaults to `true`.
 
 
 #### HTTP Basic Auth
@@ -141,7 +149,7 @@ app.get('/proxy/:route', requestProxy({
 Only `GET` requests are subject to caching, for all other methods the `cacheMaxAge` is ignored.
 
 #### Caching Headers
-If an API response is served from the cache, the `max-age` header will be set to the remaining TTL of the cached object. The proxy cache trumps any HTTP headers such as `Last-Modified`, `Expires`, or `ETag`, so these get discarded. Effectively the proxy takes over the caching behavior from the origin for the duration that it exists there.
+If an API response is served from the cache, the `max-age` header will be set to the remaining TTL of the cached object. The proxy cache trumps any HTTP headers such as `Last-Modified`, `Expires`, or `ETag`, so these get discarded. Effectively the proxy takes over the caching behavior from the origin for the duration that it exists there.  This can be disabled by setting the `setCacheControlHeader` option to `false`.
 
 ### Ensure Authenticated
 
